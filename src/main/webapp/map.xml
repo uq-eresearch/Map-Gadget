@@ -11,14 +11,18 @@
      <script type="text/javascript" src="./lib/ext3.2/adapter/jquery/ext-jquery-adapter-debug.js"></script>
      <script type="text/javascript" src="./lib/ext3.2/ext-all.js"></script>
      
-	 <script type="text/javascript" src="./lib/leaflet.js"></script>
+	 <script type="text/javascript" src="./lib/leaflet/leaflet.js"></script>
      <script type="text/javascript" src="./lib/Google.js"></script>
      
-     <script type="text/javascript" src="init.js"></script>
+     <script type="text/javascript" src="./CSV.js"></script>
+     <script type="text/javascript" src="./init.js"></script>
      
 	 <link rel="stylesheet" type="text/css" href="./lib/ext3.2/resources/css/ext-all.css"/>
      <link rel="stylesheet" type="text/css" href="./lib/ext3.2/resources/css/xtheme-gray.css"/>
+	 <link rel="stylesheet" type="text/css" href="./lib/leaflet/leaflet.css" />
      <link rel="stylesheet" type="text/css" href="./lore_map.css"/>
-	 <link rel="stylesheet" type="text/css" href="./leaflet.css" />
+	 
+	 <div id="maparea"></div>
+	 <input id="myInput" type="file" style="visibility:hidden" />
   ]]></Content>
 </Module>
