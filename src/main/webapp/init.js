@@ -178,11 +178,14 @@ Ext.onReady(function(){
         ],
         listeners : {
         	afterrender : function(c) {
+        		var grm1 = new L.Google("ROADMAP");
+        		var grm2 = new L.Google("SATELLITE");
+        		var grm3 = new L.Google("HYBRID");
         		map = new L.Map('map', {
-        			center: new L.LatLng(-27.4667, 153.0333), zoom: 13, attributionControl: false});
+        			center: new L.LatLng(-25.854280, 133.242188), 
+        			zoom: 4, attributionControl: false, layers: [grm1]});
         		L.control.attribution({position: 'topright'}).addTo(map);
-        		var grm = new L.Google("ROADMAP");
-        		map.addLayer(grm);
+        		L.control.layers({"Roadmap" : grm1, "Satellite" : grm2, "Hybrid" : grm3}).addTo(map);
         	}
         },
         html : "<div id='map' style='height: 566px; width: 798px;'></div>",
