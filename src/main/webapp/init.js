@@ -39,102 +39,109 @@ Ext.onReady(function(){
             {
                 text: 'Import Menu',
                 menu: [
-					new Ext.Action({
-					    text: 'Import RDF/XML',
-					    handler: function(){
-					    	$('#myInput')[0].onchange = function(result) {													 
-					    		var reader = new FileReader();
-								 reader.onload = function(e) {
-							         var markerData = [];
-									 var polyData = [];
-									 
-									 var data = e.target.result;
-									 var doc = new DOMParser().parseFromString(data, "text/xml");
-									 
-									 var databank = jQuery.rdf.databank();
-							         for (ns in NAMESPACES) {
-							             databank.prefix(ns, NAMESPACES[ns]);
-							         }
-							         databank.load(doc);
-							         var loadedRDF = jQuery.rdf({
-							        	 databank : databank
-							         });
-							         
-							         var remQuery = loadedRDF.where('?url dc:title ?title')
-							         	.where('?url dc:latitude ?lat').where('?url dc:longitude ?lon');
-							         							         
-							         for (var i = 0; i < remQuery.length; i++) {
-								         var res = remQuery.get(i);
-								         
-								         var lat = parseFloat(res.lat.value.toString());
-								         var lon = parseFloat(res.lon.value.toString());
-								         
-								         console.log(res.url.value.toString());
-								         console.log(res.title.value.toString());
-								         
-								         var marker = L.marker([lat, lon])
-									 		.bindPopup("<a href=\"" + res.url.value.toString() +
-									 				"\">" + res.title.value.toString() + "</a>");
-								         markerData.push(marker);
-								         polyData.push([lat, lon]);
-							         }
-							         
-									 if (markerData.length > 0) {
-										 if (markers) {
-											 map.removeLayer(markers);
-										 }
-										 markers = L.layerGroup(markerData);
-										 markers.addTo(map);
-									 									 
-										 map.fitBounds(polyData, {animate: false, padding: [10, 10]});
-									 }
-								 }
-								 reader.readAsText(result.target.files[0]);
-					        }
-							$('#myInput').click();
-					    }
-					}),
-					new Ext.Action({
-					    text: 'Import JSON',
-					    handler: function(){
-					    	$('#myInput')[0].onchange = function(result) {													 
-								 var reader = new FileReader();
-								 reader.onload = function(e) {
-									 var data = jQuery.parseJSON(e.target.result);
-									 var markerData = [];
-									 var polyData = [];
-									 	
-									 for (var recordID in data) {
-										 var record = data[recordID];
-										 
-										 if (record["http://purl.org/dc/elements/1.1/latitude"] &&
-												 record["http://purl.org/dc/elements/1.1/longitude"]) {											 
-											 var lat = parseFloat(record["http://purl.org/dc/elements/1.1/latitude"][0].value);
-											 var lon = parseFloat(record["http://purl.org/dc/elements/1.1/longitude"][0].value);
-											 
-											 var marker = L.marker([lat, lon])
-											 		.bindPopup("<a href=\"" + recordID + "\">" + 
-											 				record["http://purl.org/dc/elements/1.1/title"][0].value + "</a>");
-											 markerData.push(marker);
-											 polyData.push([lat, lon]);
-										 }
-									 }
-									 
-									 if (markerData.length > 0) {
-										 if (markers) {
-											 map.removeLayer(markers);
-										 }
-										 markers = L.layerGroup(markerData);
-										 markers.addTo(map);
-									 									 
-										 map.fitBounds(polyData, {animate: false, padding: [10, 10]});
-									 }
-								 }
-								 reader.readAsText(result.target.files[0]);
-					        }
-							$('#myInput').click();
-					    }
-					}),
+					{
+						text: 'Import from LORE',
+						menu: {
+						    items: [
+						        new Ext.Action({
+								    text: 'Import RDF/XML',
+								    handler: function(){
+								    	$('#myInput')[0].onchange = function(result) {													 
+								    		var reader = new FileReader();
+											 reader.onload = function(e) {
+										         var markerData = [];
+												 var polyData = [];
+												 
+												 var data = e.target.result;
+												 var doc = new DOMParser().parseFromString(data, "text/xml");
+												 
+												 var databank = jQuery.rdf.databank();
+										         for (ns in NAMESPACES) {
+										             databank.prefix(ns, NAMESPACES[ns]);
+										         }
+										         databank.load(doc);
+										         var loadedRDF = jQuery.rdf({
+										        	 databank : databank
+										         });
+										         
+										         var remQuery = loadedRDF.where('?url dc:title ?title')
+										         	.where('?url dc:latitude ?lat').where('?url dc:longitude ?lon');
+										         							         
+										         for (var i = 0; i < remQuery.length; i++) {
+											         var res = remQuery.get(i);
+											         
+											         var lat = parseFloat(res.lat.value.toString());
+											         var lon = parseFloat(res.lon.value.toString());
+											         
+											         console.log(res.url.value.toString());
+											         console.log(res.title.value.toString());
+											         
+											         var marker = L.marker([lat, lon])
+												 		.bindPopup("<a href=\"" + res.url.value.toString() +
+												 				"\">" + res.title.value.toString() + "</a>");
+											         markerData.push(marker);
+											         polyData.push([lat, lon]);
+										         }
+										         
+												 if (markerData.length > 0) {
+													 if (markers) {
+														 map.removeLayer(markers);
+													 }
+													 markers = L.layerGroup(markerData);
+													 markers.addTo(map);
+												 									 
+													 map.fitBounds(polyData, {animate: false, padding: [10, 10]});
+												 }
+											 }
+											 reader.readAsText(result.target.files[0]);
+								        }
+										$('#myInput').click();
+								    }
+								}),
+								new Ext.Action({
+								    text: 'Import JSON',
+								    handler: function(){
+								    	$('#myInput')[0].onchange = function(result) {													 
+											 var reader = new FileReader();
+											 reader.onload = function(e) {
+												 var data = jQuery.parseJSON(e.target.result);
+												 var markerData = [];
+												 var polyData = [];
+												 	
+												 for (var recordID in data) {
+													 var record = data[recordID];
+													 
+													 if (record["http://purl.org/dc/elements/1.1/latitude"] &&
+															 record["http://purl.org/dc/elements/1.1/longitude"]) {											 
+														 var lat = parseFloat(record["http://purl.org/dc/elements/1.1/latitude"][0].value);
+														 var lon = parseFloat(record["http://purl.org/dc/elements/1.1/longitude"][0].value);
+														 
+														 var marker = L.marker([lat, lon])
+														 		.bindPopup("<a href=\"" + recordID + "\">" + 
+														 				record["http://purl.org/dc/elements/1.1/title"][0].value + "</a>");
+														 markerData.push(marker);
+														 polyData.push([lat, lon]);
+													 }
+												 }
+												 
+												 if (markerData.length > 0) {
+													 if (markers) {
+														 map.removeLayer(markers);
+													 }
+													 markers = L.layerGroup(markerData);
+													 markers.addTo(map);
+												 									 
+													 map.fitBounds(polyData, {animate: false, padding: [10, 10]});
+												 }
+											 }
+											 reader.readAsText(result.target.files[0]);
+								        }
+										$('#myInput').click();
+								    }
+								})
+						    ]
+						}      
+					},
 					new Ext.Action({
 					    text: 'Import CSV',
 					    handler: function(){
