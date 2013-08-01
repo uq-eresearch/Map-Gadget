@@ -16,6 +16,7 @@
      <script type="text/javascript" src="./lib/Google.js"></script>
      
      <script type="text/javascript" src="./CSV.js"></script>
+     <script type="text/javascript" src="./Search.js"></script>
      <script type="text/javascript" src="./init.js"></script>
      
 	 <link rel="stylesheet" type="text/css" href="./lib/ext3.2/resources/css/ext-all.css"/>
