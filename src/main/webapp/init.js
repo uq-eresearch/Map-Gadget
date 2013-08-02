@@ -1,4 +1,6 @@
 var map, markers;
+var control;
+var overlays = [];
 
 var NAMESPACES = {
     "dc"      	: "http://purl.org/dc/elements/1.1/",
@@ -29,6 +31,21 @@ var NAMESPACES = {
 };
 
 L.Icon.Default.imagePath = 'http://localhost:8080/map/lib/leaflet/images';
+
+function addToLayer(markerData, polyData, listname) {
+	if (markerData.length > 0) {
+		markers = L.layerGroup(markerData);
+		
+		overlays.push(markers);
+		
+		control.addOverlay(markers, listname);
+		control.removeFrom(map);
+		control.addTo(map);
+		map.addLayer(markers);
+		
+		map.fitBounds(polyData, {animate: false, padding: [10, 10]});
+	}
+};
 
 Ext.onReady(function(){
     var panel = new Ext.Panel({
@@ -83,15 +100,7 @@ Ext.onReady(function(){
 											         polyData.push([lat, lon]);
 										         }
 										         
-												 if (markerData.length > 0) {
-													 if (markers) {
-														 map.removeLayer(markers);
-													 }
-													 markers = L.layerGroup(markerData);
-													 markers.addTo(map);
-												 									 
-													 map.fitBounds(polyData, {animate: false, padding: [10, 10]});
-												 }
+										         addToLayer(markerData, polyData, "<LORE RDF/XML>");
 											 }
 											 reader.readAsText(result.target.files[0]);
 								        }
@@ -124,15 +133,7 @@ Ext.onReady(function(){
 													 }
 												 }
 												 
-												 if (markerData.length > 0) {
-													 if (markers) {
-														 map.removeLayer(markers);
-													 }
-													 markers = L.layerGroup(markerData);
-													 markers.addTo(map);
-												 									 
-													 map.fitBounds(polyData, {animate: false, padding: [10, 10]});
-												 }
+												 addToLayer(markerData, polyData, "<LORE JSON>");
 											 }
 											 reader.readAsText(result.target.files[0]);
 								        }
@@ -165,15 +166,7 @@ Ext.onReady(function(){
 										 }
 									 }
 									 
-									 if (markerData.length > 0) {
-										 if (markers) {
-											 map.removeLayer(markers);
-										 }
-										 markers = L.layerGroup(markerData);
-										 markers.addTo(map);
-									 									 
-										 map.fitBounds(polyData, {animate: false, padding: [10, 10]});
-									 }
+									 addToLayer(markerData, polyData, "<CSV>");
 								 }
 								 reader.readAsText(result.target.files[0]);
 					        }
@@ -185,19 +178,33 @@ Ext.onReady(function(){
             {
                 xtype: 'tbseparator'
             },
-            {
-        		xtype: 'textfield',
-        		fieldLabel: 'searchTerm',
-        		id: 'HUNISearchTerm',
-        		cls: 'round'
-            },
-            {
-            	xtype: 'tbspacer'
-            },
             new Ext.Action({
                 text: 'Search HuNI',
                 handler: function(){
-                    searchHUNI($("#HUNISearchTerm")[0].value);
+                	Ext.MessageBox.prompt(
+	        			'Search HuNI', 
+	        			'Please enter your search terms',
+	        			function(btn, text){
+	                	    if (btn == 'ok'){
+	                	        searchHUNI(text);
+	                	    }
+	        			}
+	        		);
+                }
+            }),
+            {
+                xtype: 'tbseparator'
+            },
+            new Ext.Action({
+                text: 'Clear All',
+                handler: function(){
+                	for (var i = 0; i < overlays.length; i++) {
+                		map.removeLayer(overlays[i])
+                		control.removeLayer(overlays[i]);
+                	}
+                	
+            		control.removeFrom(map);
+            		control.addTo(map);
                 }
             })
         ],
@@ -209,13 +216,15 @@ Ext.onReady(function(){
         		map = new L.Map('map', {
         			center: new L.LatLng(-25.854280, 133.242188), 
         			zoom: 4, attributionControl: false, layers: [grm1]});
+        		
+        		
         		L.control.attribution({position: 'topright'}).addTo(map);
-        		L.control.layers({"Roadmap" : grm1, "Satellite" : grm2, "Hybrid" : grm3}).addTo(map);
+        		control = L.control.layers({"Roadmap" : grm1, "Satellite" : grm2, "Hybrid" : grm3});
+        		control.addTo(map);
+        		
         	}
         },
         html : "<div id='map' style='height: 566px; width: 798px;'></div>",
         renderTo: Ext.get("maparea")
-    });
-    
-	
+    });	
 });

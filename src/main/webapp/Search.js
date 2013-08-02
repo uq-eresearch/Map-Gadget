@@ -47,15 +47,7 @@ function searchHUNI(matchval) {
         		}
         	}
     	}
+    	addToLayer(markerData, polyData, "\"" + matchval + "\"");
     	
-    	if (markerData.length > 0) {
-			if (markers) {
-				map.removeLayer(markers);
-			}
-			markers = L.layerGroup(markerData);
-			markers.addTo(map);
-		 								 
-			map.fitBounds(polyData, {animate: false, padding: [10, 10]});
-		}
     }, params);
 }
