@@ -49,7 +49,7 @@ function addToLayer(markerData, polyData, listname) {
 
 Ext.onReady(function(){
     var panel = new Ext.Panel({
-        width:800,
+        width:744,
         height:595,
 
         tbar: [
@@ -237,7 +237,7 @@ Ext.onReady(function(){
         		
         	}
         },
-        html : "<div id='map' style='height: 566px; width: 798px;'></div>",
+        html : "<div id='map' style='height: 566px; width: 742px;'></div>",
         renderTo: Ext.get("maparea")
     });	
 });
