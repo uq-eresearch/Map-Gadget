@@ -90,9 +90,6 @@ Ext.onReady(function(){
 											         var lat = parseFloat(res.lat.value.toString());
 											         var lon = parseFloat(res.lon.value.toString());
 											         
-											         console.log(res.url.value.toString());
-											         console.log(res.title.value.toString());
-											         
 											         var marker = L.marker([lat, lon])
 												 		.bindPopup("<a href=\"" + res.url.value.toString() +
 												 				"\">" + res.title.value.toString() + "</a>");

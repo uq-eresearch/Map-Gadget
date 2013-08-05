@@ -3,6 +3,8 @@ function searchHUNI(matchval) {
 		return;
 	}
 	
+	var layerTitle = Ext.util.Format.ellipsis(matchval, 30);
+	
 	if (matchval.indexOf(" ") != -1) {
 		var split = matchval.split(" ");
 		matchval = "";
@@ -47,7 +49,7 @@ function searchHUNI(matchval) {
         		}
         	}
     	}
-    	addToLayer(markerData, polyData, "\"" + matchval + "\"");
+    	addToLayer(markerData, polyData, "\"" + layerTitle + "\"");
     	
     }, params);
 }
