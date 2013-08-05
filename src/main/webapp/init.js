@@ -54,7 +54,7 @@ Ext.onReady(function(){
 
         tbar: [
             {
-                text: 'Import',
+                text: 'Import/Export ',
                 menu: [
 					{
 						text: 'Import from LORE',
@@ -168,6 +168,22 @@ Ext.onReady(function(){
 								 reader.readAsText(result.target.files[0]);
 					        }
 							$('#myInput').click();
+					    }
+					}),
+					new Ext.Action({
+					    text: 'Export to GeoJSON',
+					    handler: function(){
+					    	var exportJSONString = "[";
+		                	for (var i = 0; i < overlays.length; i++) {
+		                		exportJSONString += Ext.util.JSON.encode(overlays[i].toGeoJSON());
+		                		if (i + 1 < overlays.length) {
+		                			exportJSONString += ",";
+		                		}
+		                	}
+                			exportJSONString += "]";
+                			
+                			var blob = new Blob([exportJSONString], {type: "text/plain;charset=utf-8"});
+            	        	saveAs(blob, "GeoJSON.txt");
 					    }
 					})
                 ]

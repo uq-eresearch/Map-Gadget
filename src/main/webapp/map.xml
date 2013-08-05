@@ -12,6 +12,9 @@
      <script type="text/javascript" src="./lib/ext3.2/adapter/jquery/ext-jquery-adapter-debug.js"></script>
      <script type="text/javascript" src="./lib/ext3.2/ext-all.js"></script>
      
+     <script type="text/javascript" src="./lib/FileSaver/FileSaver.js"></script>
+     <script type="text/javascript" src="./lib/FileSaver/Blob.js"></script>
+     
 	 <script type="text/javascript" src="./lib/leaflet/leaflet.js"></script>
      <script type="text/javascript" src="./lib/Google.js"></script>
      
