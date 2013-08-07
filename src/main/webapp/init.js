@@ -1,4 +1,4 @@
-var map, control, store, rType, win, listview;
+var map, control, store, rType, win, listView, openURLButton;
 var markers = [];
 var overlays = [];
 
@@ -232,7 +232,7 @@ Ext.onReady(function(){
                 		}
                 	}
                 	
-                	listview = new Ext.list.ListView({
+                	listView = new Ext.list.ListView({
                         store: store,
                         multiSelect: true,
                         emptyText: 'No images to display',
@@ -257,6 +257,26 @@ Ext.onReady(function(){
                         }]
                     });
                 	
+                    listView.on('selectionchange', function(view, nodes){
+                        if (nodes.length > 0) {
+                        	openURLButton.enable();
+                        } else {
+                        	openURLButton.disable();                        	
+                        }
+                    });
+                	
+                    openURLButton = new Ext.Action({
+                        text: 'Open URL',
+                        disabled: true,
+                        handler: function(){
+                        	if (listView.selected.elements.length > 0) {
+                        		for (var i = 0; i < listView.selected.elements.length; i++) {
+                        			window.open(listView.selected.elements[i].childNodes[1].textContent,'_blank');  
+                        		}
+                        	}
+                        }
+                    });
+                    
                 	win = new Ext.Window({
                         closable:false,
                         width:600,
@@ -282,14 +302,7 @@ Ext.onReady(function(){
 		                	        	saveAs(blob, "JSON.txt");
 		                            }
 		                        }),
-		                        new Ext.Action({
-		                            text: 'Open URL',
-		                            handler: function(){
-		                            	if (listview.selected.elements.length == 1) {
-		                            		window.open(listview.selected.elements[0].childNodes[1].textContent,'_blank');        	
-		                            	}
-		                            }
-		                        }),
+		                        openURLButton,
 		                        '->',
 		                        new Ext.Action({
 		                            text: 'Close',
@@ -299,7 +312,7 @@ Ext.onReady(function(){
 		                        })
                         ],
                         items: [
-                            listview
+                            listView
                         ]
                     });
                 	
