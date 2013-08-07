@@ -29,5 +29,6 @@
 	 
 	 <div id="maparea"></div>
 	 <input id="myInput" type="file" style="visibility:hidden" />
+	 <div id="popup-win"></div>
   ]]></Content>
 </Module>

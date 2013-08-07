@@ -42,8 +42,8 @@ function searchHUNI(matchval) {
 	        		var url = doc.prov_source;
 	        		var title = doc.name;
 	        		        		
-	        		var marker = L.marker([lat, lon])
-				 		.bindPopup("<a href=\"" + url + "\" target=\"_parent\">" + title + "</a>");
+	        		var marker = L.marker([lat, lon], {"name": title, "url": url})
+				 		.bindPopup("<a href=\"" + url + "\" target=\"_blank\">" + title + "</a>");
 			        markerData.push(marker);
 			        polyData.push([lat, lon]);
         		}

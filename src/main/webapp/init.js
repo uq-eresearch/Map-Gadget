@@ -1,5 +1,5 @@
-var map, markers;
-var control;
+var map, control, store, rType, win, listview;
+var markers = [];
 var overlays = [];
 
 var NAMESPACES = {
@@ -33,21 +33,30 @@ var NAMESPACES = {
 L.Icon.Default.imagePath = 'http://localhost:8080/map/lib/leaflet/images';
 
 function addToLayer(markerData, polyData, listname) {
-	if (markerData.length > 0) {
-		markers = L.layerGroup(markerData);
+	if (markerData.length > 0) {		
+		markers = markers.concat(markerData);
 		
-		overlays.push(markers);
+		var markerData = L.layerGroup(markerData);
 		
-		control.addOverlay(markers, listname);
+		overlays.push(markerData);
+		
+		control.addOverlay(markerData, listname);
 		control.removeFrom(map);
 		control.addTo(map);
-		map.addLayer(markers);
+		map.addLayer(markerData);
 		
 		map.fitBounds(polyData, {animate: false, padding: [10, 10]});
 	}
 };
 
 Ext.onReady(function(){
+	rType = Ext.data.Record.create(['name', 'url', {name:'lat', type: 'float'}, {name:'lng', type: 'float'}]);
+	
+	store = new Ext.data.JsonStore({
+        fields: rType,
+        data : []
+    });
+	
     var panel = new Ext.Panel({
         width:744,
         height:595,
@@ -90,7 +99,7 @@ Ext.onReady(function(){
 											         var lat = parseFloat(res.lat.value.toString());
 											         var lon = parseFloat(res.lon.value.toString());
 											         
-											         var marker = L.marker([lat, lon])
+											         var marker = L.marker([lat, lon], {"name": res.title.value.toString(), "url": res.url.value.toString()})
 												 		.bindPopup("<a href=\"" + res.url.value.toString() +
 												 				"\">" + res.title.value.toString() + "</a>");
 											         markerData.push(marker);
@@ -122,7 +131,7 @@ Ext.onReady(function(){
 														 var lat = parseFloat(record["http://purl.org/dc/elements/1.1/latitude"][0].value);
 														 var lon = parseFloat(record["http://purl.org/dc/elements/1.1/longitude"][0].value);
 														 
-														 var marker = L.marker([lat, lon])
+														 var marker = L.marker([lat, lon], {"name": record["http://purl.org/dc/elements/1.1/title"][0].value, "url": recordID})
 														 		.bindPopup("<a href=\"" + recordID + "\">" + 
 														 				record["http://purl.org/dc/elements/1.1/title"][0].value + "</a>");
 														 markerData.push(marker);
@@ -156,7 +165,7 @@ Ext.onReady(function(){
 										 if (lat && lon && data[i].Name) {
 											 lat = parseFloat(lat);
 											 lon = parseFloat(lon);
-											 var marker = L.marker([lat, lon])
+											 var marker = L.marker([lat, lon], {"name": data[i].Name})
 											 		.bindPopup(data[i].Name);
 											 markerData.push(marker);
 											 polyData.push([lat, lon]);
@@ -209,12 +218,106 @@ Ext.onReady(function(){
                 xtype: 'tbseparator'
             },
             new Ext.Action({
+                text: 'View Selection',
+                handler: function(){  
+                	if (win) {
+                		win.close();
+                	}
+                	store.clearData();
+                	for (var i = 0; i < markers.length; i++) {
+                		var m = markers[i];
+                		if (map.getBounds().contains(m.getLatLng())) {
+                			var latLng = m.getLatLng();
+                        	store.add(new rType({"name": m.options.name, "url": m.options.url, "lat": latLng.lat,"lng": latLng.lng}));
+                		}
+                	}
+                	
+                	listview = new Ext.list.ListView({
+                        store: store,
+                        multiSelect: true,
+                        emptyText: 'No images to display',
+                        reserveScrollOffset: true,
+                        style: 'background: white;',
+                        columns: [{
+                            header: 'Name',
+                            width: .3,
+                            dataIndex: 'name'
+                        },{
+                            header: 'URL',
+                            width: .45,
+                            dataIndex: 'url'
+                        },{
+                            header: 'Latitude',
+                            dataIndex: 'lat',
+                            width: .125
+                        },{
+                            header: 'Longitude',
+                            dataIndex: 'lng',
+                            width: .125
+                        }]
+                    });
+                	
+                	win = new Ext.Window({
+                        closable:false,
+                        width:600,
+                        height:350,
+                        layout:'fit',
+
+                        tbar: [
+                               new Ext.Action({
+		                            text: 'Export',
+		                            handler: function(){
+		                            	var exportJSONString = "[";
+		    		                	for (var i = 0; i < store.data.items.length; i++) {
+		    		                		var item = store.data.items[i];
+		    		                		
+		    		                		exportJSONString += Ext.util.JSON.encode(item.data);
+		    		                		if (i + 1 < store.data.items.length) {
+		    		                			exportJSONString += ",";
+		    		                		}
+		    		                	}
+		                    			exportJSONString += "]";
+		                    			
+		                    			var blob = new Blob([exportJSONString], {type: "text/plain;charset=utf-8"});
+		                	        	saveAs(blob, "JSON.txt");
+		                            }
+		                        }),
+		                        new Ext.Action({
+		                            text: 'Open URL',
+		                            handler: function(){
+		                            	if (listview.selected.elements.length == 1) {
+		                            		window.open(listview.selected.elements[0].childNodes[1].textContent,'_blank');        	
+		                            	}
+		                            }
+		                        }),
+		                        '->',
+		                        new Ext.Action({
+		                            text: 'Close',
+		                            handler: function(){
+		                        		win.close();		                            	
+		                            }
+		                        })
+                        ],
+                        items: [
+                            listview
+                        ]
+                    });
+                	
+                    win.show(this);
+                }
+            }),
+            {
+                xtype: 'tbseparator'
+            },
+            new Ext.Action({
                 text: 'Clear All',
                 handler: function(){
                 	for (var i = 0; i < overlays.length; i++) {
                 		map.removeLayer(overlays[i])
                 		control.removeLayer(overlays[i]);
                 	}
+                	
+                	markers = [];
                 	
             		control.removeFrom(map);
             		control.addTo(map);
@@ -234,7 +337,6 @@ Ext.onReady(function(){
         		L.control.attribution({position: 'topright'}).addTo(map);
         		control = L.control.layers({"Roadmap" : grm1, "Satellite" : grm2, "Hybrid" : grm3});
         		control.addTo(map);
-        		
         	}
         },
         html : "<div id='map' style='height: 566px; width: 742px;'></div>",
