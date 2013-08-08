@@ -106,7 +106,7 @@ Ext.onReady(function(){
 											         polyData.push([lat, lon]);
 										         }
 										         
-										         addToLayer(markerData, polyData, "<LORE RDF/XML>");
+										         addToLayer(markerData, polyData, "RDF/XML Data");
 											 }
 											 reader.readAsText(result.target.files[0]);
 								        }
@@ -139,7 +139,7 @@ Ext.onReady(function(){
 													 }
 												 }
 												 
-												 addToLayer(markerData, polyData, "<LORE JSON>");
+												 addToLayer(markerData, polyData, "JSON Data");
 											 }
 											 reader.readAsText(result.target.files[0]);
 								        }
@@ -172,7 +172,7 @@ Ext.onReady(function(){
 										 }
 									 }
 									 
-									 addToLayer(markerData, polyData, "<CSV>");
+									 addToLayer(markerData, polyData, "CSV Data");
 								 }
 								 reader.readAsText(result.target.files[0]);
 					        }
@@ -180,19 +180,27 @@ Ext.onReady(function(){
 					    }
 					}),
 					new Ext.Action({
-					    text: 'Export to GeoJSON',
+					    text: 'Export to JSON',
 					    handler: function(){
-					    	var exportJSONString = "[";
+					    	var jsonArray = [];
 		                	for (var i = 0; i < overlays.length; i++) {
-		                		exportJSONString += Ext.util.JSON.encode(overlays[i].toGeoJSON());
-		                		if (i + 1 < overlays.length) {
-		                			exportJSONString += ",";
-		                		}
+		                		if (map.hasLayer(overlays[i])) {
+			                		overlays[i].eachLayer(function (layer) {
+			                			var latlng = layer.getLatLng();			                					
+			                			jsonArray.push({
+			                				"name" : layer.options.name,
+			                				"url" : layer.options.url,
+			                				"lat" : latlng.lat,
+			                				"lng" : latlng.lng,
+			                			});
+			                		});
+			                	}
 		                	}
-                			exportJSONString += "]";
-                			
-                			var blob = new Blob([exportJSONString], {type: "text/plain;charset=utf-8"});
-            	        	saveAs(blob, "GeoJSON.txt");
+
+		                	if (jsonArray.length > 0) {
+		                		var blob = new Blob([Ext.util.JSON.encode(jsonArray)], {type: "text/plain;charset=utf-8"});
+            	        		saveAs(blob, "JSON.txt");
+		                	}
 					    }
 					})
                 ]
@@ -218,7 +226,7 @@ Ext.onReady(function(){
                 xtype: 'tbseparator'
             },
             new Ext.Action({
-                text: 'View Selection',
+                text: 'List View',
                 handler: function(){  
                 	if (win) {
                 		win.close();
@@ -287,19 +295,15 @@ Ext.onReady(function(){
                                new Ext.Action({
 		                            text: 'Export',
 		                            handler: function(){
-		                            	var exportJSONString = "[";
+		                	        	var jsonArray = [];
 		    		                	for (var i = 0; i < store.data.items.length; i++) {
-		    		                		var item = store.data.items[i];
-		    		                		
-		    		                		exportJSONString += Ext.util.JSON.encode(item.data);
-		    		                		if (i + 1 < store.data.items.length) {
-		    		                			exportJSONString += ",";
-		    		                		}
+		    		                		jsonArray.push(store.data.items[i].data);
 		    		                	}
-		                    			exportJSONString += "]";
 		                    			
-		                    			var blob = new Blob([exportJSONString], {type: "text/plain;charset=utf-8"});
-		                	        	saveAs(blob, "JSON.txt");
+		    		                	if (jsonArray.length > 0) {
+		    		                		var blob = new Blob([Ext.util.JSON.encode(jsonArray)], {type: "text/plain;charset=utf-8"});
+		                	        		saveAs(blob, "JSON.txt");
+		    		                	}
 		                            }
 		                        }),
 		                        openURLButton,
